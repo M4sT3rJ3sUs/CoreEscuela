@@ -4,10 +4,10 @@ using System.Text;
 
 namespace CoreEscuela.Entidades
 {
-    public enum TiposEscuela
+    public enum TiposDeEscuela
     {
         Primaria,
-        Secundaria,
-        PreEscolar
+        secuandaria,
+        prescolar
     }
 }
