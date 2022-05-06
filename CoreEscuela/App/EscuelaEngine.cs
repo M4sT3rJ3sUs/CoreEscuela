@@ -22,7 +22,7 @@ namespace CoreEscuela
 
             CargarCursos();
             CargarAsignaturas();
-            CargarEvaluaciones();
+            //CargarEvaluaciones();
 
         }
 
