@@ -1,34 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CoreEscuela.Entidades
 {
     public class Escuela
     {
-        public string Nombre { get; set; }
-        public int AñorDeCreacion { get; set; }
+        public string UniqueId { get; private set; } = Guid.NewGuid().ToString();
+        string nombre;
+        public string Nombre
+        {
+            get { return "Copia:" + nombre; }
+            set { nombre = value.ToUpper(); }
+        }
+        public int AñoDeCreación { get; set; }
+
         public string Pais { get; set; }
         public string Ciudad { get; set; }
-        public TiposDeEscuela TipoEscuerla { get; set; }
-        public List<Curso> CursosLista { get; set; }
+        public TiposEscuela TipoEscuela { get; set; }
+        public List<Curso> Cursos { get; set; }
 
-        public Escuela(string Nombre, int AñorDeCreacion) => (this.Nombre, this.AñorDeCreacion) = (Nombre, AñorDeCreacion);
+        public Escuela(string nombre, int año) => (Nombre, AñoDeCreación) = (nombre, año);
 
-        public Escuela(string Nombre, int AñorDeCreacion,
-            TiposDeEscuela TipoEscuela,
-            string Pais = "",
-            string Ciudad = "")
+        public Escuela(string nombre, int año,
+                       TiposEscuela tipo,
+                       string pais = "", string ciudad = "") : base()
         {
-
-            this.Nombre = Nombre;
-            this.AñorDeCreacion = AñorDeCreacion;
-            this.Pais = Pais;
-            this.Ciudad = Ciudad;
+            (Nombre, AñoDeCreación) = (nombre, año);
+            Pais = pais;
+            Ciudad = ciudad;
         }
+
         public override string ToString()
         {
-            return $"Nombre Escuela: {Nombre}, Tipo Escuela: {TipoEscuerla},\nPais: {Pais}, Ciudad: {Ciudad}";
+            return $"Nombre: \"{Nombre}\", Tipo: {TipoEscuela} {System.Environment.NewLine} Pais: {Pais}, Ciudad:{Ciudad}";
         }
     }
 }

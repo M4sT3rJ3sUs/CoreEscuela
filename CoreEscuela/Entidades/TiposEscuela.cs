@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoreEscuela.Entidades
+﻿namespace CoreEscuela.Entidades
 {
-    public enum TiposDeEscuela
+    public enum TiposEscuela
     {
         Primaria,
-        secuandaria,
-        prescolar
+        Secundaria,
+        PreEscolar
     }
 }
