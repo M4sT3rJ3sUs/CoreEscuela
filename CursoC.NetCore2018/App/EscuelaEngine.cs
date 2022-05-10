@@ -73,7 +73,7 @@ namespace CoreEscuela
 
             return listaObj;
         }
-
+        #region Metodos de Carga
         private void CargarAsignaturas()
         {
             foreach (var curso in Escuela.Cursos)
@@ -120,4 +120,5 @@ namespace CoreEscuela
             }
         }
     }
+    #endregion Metodos de Carga
 }
