@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using CoreEscuela.Entidades;
 using CoreEscuela.Util;
 using static System.Console;
-using System.Linq;
 
 namespace CoreEscuela
 {
@@ -12,26 +11,40 @@ namespace CoreEscuela
     {
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += AccionDelEvento;
+            AppDomain.CurrentDomain.ProcessExit += (o, s) => Printer.Beep(2000, 1000, 1);
+
             var engine = new EscuelaEngine();
             engine.Inicializar();
             Printer.WriteTitle("BIENVENIDOS A LA ESCUELA");
             //Printer.Beep(10000, cantidad: 10);
-            ImpimirCursosEscuela(engine.Escuela);
+            //ImpimirCursosEscuela(engine.Escuela);
+            Dictionary<int, string> dicccionario = new Dictionary<int, string>();
 
+            dicccionario.Add(10, "JuanK");
 
-            Dictionary<int, string> diccionario = new Dictionary<int, string>();
-            diccionario.Add(10, "JuanK");
-            diccionario.Add(23, "Lorem Ipsum");
+            dicccionario.Add(23, "Lorem Ipsum");
 
-            foreach(var keyValPair in diccionario)
+            foreach (var keyValPair in dicccionario)
             {
                 WriteLine($"Key: {keyValPair.Key} Valor: {keyValPair.Value}");
             }
 
-    }
+            var dictmp = engine.GetDiccionarioObjetos();
+
+            engine.ImprimirDiccionario(dictmp, true);
+
+        }
+
+        private static void AccionDelEvento(object sender, EventArgs e)
+        {
+            Printer.WriteTitle("SALIENDO");
+            Printer.Beep(3000, 1000, 3);
+            Printer.WriteTitle("SALIÓ");
+        }
 
         private static void ImpimirCursosEscuela(Escuela escuela)
-{
+        {
 
             Printer.WriteTitle("Cursos de la Escuela");
 
