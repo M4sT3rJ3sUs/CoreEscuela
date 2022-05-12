@@ -66,9 +66,9 @@ namespace CoreEscuela.App
                             into grupoEvaluacionesAlumno
                                        select new AlumnoPromedio
                                        {
-                                           alumnoid = grupoEvaluacionesAlumno.Key.UniqueId,
-                                           alumnoNombre = grupoEvaluacionesAlumno.Key.Nombre,
-                                           promedio = grupoEvaluacionesAlumno.Average(evaluacion => evaluacion.Nota)
+                                           AlumnoId = grupoEvaluacionesAlumno.Key.UniqueId,
+                                           AlumnoNombre = grupoEvaluacionesAlumno.Key.Nombre,
+                                           Promedio = grupoEvaluacionesAlumno.Average(evaluacion => evaluacion.Nota)
                                        };
                 respuesta.Add(asignaturaConEvaluaciones.Key, promediosAlumnos);
             }
@@ -90,10 +90,10 @@ namespace CoreEscuela.App
                             into grupoEvaluacionesAlumno
                                         select new AlumnoPromedio
                                         {
-                                            alumnoid = grupoEvaluacionesAlumno.Key.UniqueId,
-                                            alumnoNombre = grupoEvaluacionesAlumno.Key.Nombre,
-                                            promedio = grupoEvaluacionesAlumno.Average(evaluacion => evaluacion.Nota)
-                                        }).OrderByDescending(alumno => alumno.promedio).Take(top);
+                                            AlumnoId = grupoEvaluacionesAlumno.Key.UniqueId,
+                                            AlumnoNombre = grupoEvaluacionesAlumno.Key.Nombre,
+                                            Promedio = grupoEvaluacionesAlumno.Average(evaluacion => evaluacion.Nota)
+                                        }).OrderByDescending(alumno => alumno.Promedio).Take(top);
                 respuesta.Add(asignaturaConEvaluaciones.Key, promediosAlumnos);
             }
             return respuesta;
