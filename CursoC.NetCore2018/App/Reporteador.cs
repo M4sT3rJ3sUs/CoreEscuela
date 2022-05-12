@@ -1,7 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using CoreEscuela.Entidades;
+using System;
 using System.Collections.Generic;
-using CoreEscuela.Entidades;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CoreEscuela.App
 {
@@ -12,80 +14,103 @@ namespace CoreEscuela.App
         {
             if (dicObsEsc == null)
                 throw new ArgumentNullException(nameof(dicObsEsc));
-
-            _diccionario = dicObsEsc;
+            this._diccionario = dicObsEsc;
         }
 
         public IEnumerable<Evaluacion> GetListaEvaluaciones()
         {
-            if (_diccionario.TryGetValue(LlaveDiccionario.Evaluacion,
-                                                 out IEnumerable<ObjetoEscuelaBase> lista))
-            {
-                return lista.Cast<Evaluacion>();
-            }
-            {
-                return new List<Evaluacion>();
-            }
+            IEnumerable<Evaluacion> respuesta = new List<Evaluacion>();
+            if (_diccionario.TryGetValue(LlaveDiccionario.Evaluacion, out IEnumerable<ObjetoEscuelaBase> lista))
+                respuesta = lista.Cast<Evaluacion>();
+            return respuesta;
         }
 
         public IEnumerable<string> GetListaAsignaturas()
         {
-            return GetListaAsignaturas(
-                    out var dummy);
+            return GetListaAsignaturas(out var dummy);
         }
 
-        public IEnumerable<string> GetListaAsignaturas(
-            out IEnumerable<Evaluacion> listaEvaluaciones)
+        public IEnumerable<string> GetListaAsignaturas(out IEnumerable<Evaluacion> listaEvaluaciones)
         {
             listaEvaluaciones = GetListaEvaluaciones();
-
-            return (from Evaluacion ev in listaEvaluaciones
-                    select ev.Asignatura.Nombre).Distinct();
+            return (from Evaluacion evaluacion in listaEvaluaciones
+                    select evaluacion.Asignatura.Nombre).Distinct();
         }
 
-        public Dictionary<string, IEnumerable<Evaluacion>> GetDicEvaluaXAsig()
+        public Dictionary<string, IEnumerable<Evaluacion>> GetDiccionarioEvaluacionesPorAsignatura()
         {
-            var dictaRta = new Dictionary<string, IEnumerable<Evaluacion>>();
-
-            var listaAsig = GetListaAsignaturas(out var listaEval);
-
-            foreach (var asig in listaAsig)
+            var diccionarioRespuesta = new Dictionary<string, IEnumerable<Evaluacion>>();
+            var listaAsignaturas = GetListaAsignaturas(out var listaEvaluaciones);
+            foreach (var asignatura in listaAsignaturas)
             {
-                var evalsAsig = from eval in listaEval
-                                where eval.Asignatura.Nombre == asig
-                                select eval;
-
-                dictaRta.Add(asig, evalsAsig);
+                var evaluacionesAsignaturas = from Evaluacion eval in listaEvaluaciones
+                                              where eval.Asignatura.Nombre == asignatura
+                                              select eval;
+                diccionarioRespuesta.Add(asignatura, evaluacionesAsignaturas);
             }
-
-            return dictaRta;
+            return diccionarioRespuesta;
         }
 
-        public Dictionary<string, IEnumerable<object>> GetPromeAlumnPorAsignatura()
+        public Dictionary<string, IEnumerable<Object>> GetPromedioPorAsignatura()
         {
-            var rta = new Dictionary<string, IEnumerable<object>>();
-            var dicEvalXAsig = GetDicEvaluaXAsig();
-
-            foreach (var asigConEval in dicEvalXAsig)
+            var respuesta = new Dictionary<string, IEnumerable<Object>>();
+            var diccionarioEvaluacionesPorAsignatura = GetDiccionarioEvaluacionesPorAsignatura();
+            foreach (var asignaturaConEvaluaciones in diccionarioEvaluacionesPorAsignatura)
             {
-                var promsAlumn = from eval in asigConEval.Value
-                                 group eval by new
-                                 {
-                                     eval.Alumno.UniqueId,
-                                     eval.Alumno.Nombre
-                                 }
-                            into grupoEvalsAlumno
-                                 select new AlumnoPromedio
-                                 {
-                                     alumnoid = grupoEvalsAlumno.Key.UniqueId,
-                                     alumnoNombre = grupoEvalsAlumno.Key.Nombre,
-                                     promedio = grupoEvalsAlumno.Average(evaluacion => evaluacion.Nota)
-                                 };
-
-                rta.Add(asigConEval.Key, promsAlumn);
+                var promediosAlumnos = from evaluacion in asignaturaConEvaluaciones.Value
+                                       group evaluacion by new
+                                       {
+                                           evaluacion.Alumno.UniqueId,
+                                           evaluacion.Alumno.Nombre
+                                       }
+                            into grupoEvaluacionesAlumno
+                                       select new AlumnoPromedio
+                                       {
+                                           alumnoid = grupoEvaluacionesAlumno.Key.UniqueId,
+                                           alumnoNombre = grupoEvaluacionesAlumno.Key.Nombre,
+                                           promedio = grupoEvaluacionesAlumno.Average(evaluacion => evaluacion.Nota)
+                                       };
+                respuesta.Add(asignaturaConEvaluaciones.Key, promediosAlumnos);
             }
+            return respuesta;
+        }
 
-            return rta;
+        public Dictionary<string, IEnumerable<Object>> GetTopPromedioPorCadaAsignatura(int top)
+        {
+            var respuesta = new Dictionary<string, IEnumerable<Object>>();
+            var diccionarioEvaluacionesPorAsignatura = GetDiccionarioEvaluacionesPorAsignatura();
+            foreach (var asignaturaConEvaluaciones in diccionarioEvaluacionesPorAsignatura)
+            {
+                var promediosAlumnos = (from evaluacion in asignaturaConEvaluaciones.Value
+                                        group evaluacion by new
+                                        {
+                                            evaluacion.Alumno.UniqueId,
+                                            evaluacion.Alumno.Nombre
+                                        }
+                            into grupoEvaluacionesAlumno
+                                        select new AlumnoPromedio
+                                        {
+                                            alumnoid = grupoEvaluacionesAlumno.Key.UniqueId,
+                                            alumnoNombre = grupoEvaluacionesAlumno.Key.Nombre,
+                                            promedio = grupoEvaluacionesAlumno.Average(evaluacion => evaluacion.Nota)
+                                        }).OrderByDescending(alumno => alumno.promedio).Take(top);
+                respuesta.Add(asignaturaConEvaluaciones.Key, promediosAlumnos);
+            }
+            return respuesta;
+        }
+
+        public Dictionary<String, IEnumerable<Object>> GetTopPromedioDeUnaAsignatura(string asignatura, int top)
+        {
+            var respuesta = new Dictionary<string, IEnumerable<Object>>();
+            var topPromedios = GetTopPromedioPorCadaAsignatura(top);
+            foreach (var asig in topPromedios)
+            {
+                if (asig.Key.Equals(asignatura))
+                {
+                    respuesta.Add(asignatura, asig.Value);
+                }
+            }
+            return respuesta;
         }
     }
 }
